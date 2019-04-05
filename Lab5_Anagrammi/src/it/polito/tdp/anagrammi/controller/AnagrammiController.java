@@ -1,9 +1,11 @@
 package it.polito.tdp.anagrammi.controller;
 
 import java.net.URL;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 import it.polito.tdp.anagrammi.model.Model;
 import javafx.event.ActionEvent;
@@ -39,8 +41,18 @@ public class AnagrammiController {
 
     @FXML
     void doCalcola(ActionEvent event) {
-    	List<String> result = model.AnagrammiModel(txtParola.getText());
-    	
+    	txtRight.clear();
+    	txtWrong.clear();
+    	String parola = txtParola.getText().trim().replaceAll("[.,\\\\/#!?$%\\\\^&\\\\*;:{}=\\\\-_`~()\\\\[\\\\]\\\"]", "").toLowerCase();
+    	Set<String> result = model.getAnagrammi(parola);
+    	List<String> lista = new LinkedList<>(result);
+		Collections.sort(lista);
+    	for(String s : lista) {
+    		if(model.isCorrect(s)) {
+    			txtRight.appendText(s+"\n");
+    		}
+    		else txtWrong.appendText(s+"\n");
+    	}
     	
     }
 
@@ -59,6 +71,10 @@ public class AnagrammiController {
         assert txtWrong != null : "fx:id=\"txtWrong\" was not injected: check your FXML file 'Anagrammi.fxml'.";
         assert btnReset != null : "fx:id=\"btnReset\" was not injected: check your FXML file 'Anagrammi.fxml'.";
 
+    }
+    
+    public void setModel(Model model) {
+    	this.model = model;
     }
 
 }

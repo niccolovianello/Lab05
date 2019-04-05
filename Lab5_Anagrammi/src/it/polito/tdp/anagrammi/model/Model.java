@@ -1,53 +1,59 @@
 package it.polito.tdp.anagrammi.model;
 
-import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import it.polito.tdp.anagrammi.dao.AnagrammaDAO;
 
 public class Model {
 	
-	private char[] arrayChar;
-	private List<String> anagrammi = new ArrayList<String>();
+	private Set<String> anagrammi;
 	
-	public List<String> getParoleAll() {
+	public boolean isCorrect(String parola) {
 		AnagrammaDAO dao = new AnagrammaDAO();
-		return dao.getParole();
+		for(String s : anagrammi) {
+			if(dao.isCorrect(parola))
+				return true;
+			else return false;
+		}
+		return false;
 	}
 	
-	public List<String> AnagrammiModel(String parola) {
-		arrayChar = parola.toCharArray();
-		anagrammi.add(parola);
+	public Set<String> getAnagrammi(String parola) {
+		anagrammi = new HashSet<String>();
+		List<String> lettere = new LinkedList<String>();
+		for(int i=0; i<parola.length(); i++) {
+			lettere.add(parola.substring(i, i+1));
+		}
 		
-		List<String> res = new ArrayList<String>();
-		
-		int L = 1;
-		
-		for(int i = 0; i < fatt(parola.length()); i++)//per fargli scrivere n! anagrammi, ma non dà il risultato voluto
-			generaAnagramma(arrayChar, L, 0);
-		
+		this.generaAnagramma("", lettere);
+		return anagrammi;
 	}
 	
-	private void generaAnagramma(String parziale, int L, int start) {
+	/**
+	 * Funzione ricorsiva per il calcolo degli anagrammi.
+	 * Riceve la parte iniziale dell'anagramma già costruito nei livelli ricorsivi superiori e la lista delle lettere ancora non utilizzate. Prende una per una le lettere rianenti e le appende alla parola parziale, rilanciando la ricorsione.
+	 * Quando non ci sono più lettere da inserire l'anagramma è completo, e la ricorione termina.
+	 * 
+	 * @param parziale
+	 * @param lettereRimanenti
+	 */
+	private void generaAnagramma(String parziale, List<String> lettereRimanenti) {
+	
+		//condizione di terminazione
+		if(lettereRimanenti.size()==0) {
+			anagrammi.add(parziale);
+		}
 		
-//		Le caselle da 0 a l-1 sono piene
-//		devo trovare un valore per le caselle in posizione L
-		
-//	private void cerca(String parziale, int L) 
-//		if(L == parziale.length()*parziale.length()) {
-//			if(parziale.isMagic()) {
-//				soluzioni.add(parziale.clone());
-//			}
-//			return;
-//		}
-//		
-//		for(int i = 1; i<=parziale.getSize()*parziale.getSize(); i++) {
-//			// provo a mettere il valore i nella casella L
-//			if(!parziale.contains(i))
-//				parziale.add(i);
-//			
-//			cerca(parziale, L+1);
-//			parziale.;
-//		}
+		else {
+			// sono nel mezzo della ricorsione
+			for(String lettera : lettereRimanenti) {
+				List<String> subset = new LinkedList<>(lettereRimanenti);
+				subset.remove(lettera);
+				generaAnagramma(parziale+lettera, subset);
+			}
+		}
 	}
 }
